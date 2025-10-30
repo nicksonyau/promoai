@@ -1,0 +1,8 @@
+name = "promoaiapi"
+main = "src/index.ts"
+compatibility_date = "2025-10-24"
+
+[[kv_namespaces]]
+binding = "KV"   # ✅ must match env.KV in code
+id = "feb043d71025470f8d1574f9cf956bce"
+preview_id = "feb043d71025470f8d1574f9cf956bce"
