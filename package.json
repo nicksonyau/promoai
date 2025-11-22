@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "name": "promoai",
   "version": "0.1.0",
   "private": true,
@@ -28,4 +29,30 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   }
+=======
+	"name": "promoaiapi",
+	"type": "module",
+	"scripts": {
+		"dev": "wrangler dev",
+		"deploy": "wrangler deploy --minify",
+		"cf-typegen": "wrangler types --env-interface CloudflareBindings"
+	},
+	"dependencies": {
+		"express": "^5.1.0",
+		"hono": "^4.10.3",
+		"nanoid": "^5.1.6"
+	},
+	"devDependencies": {
+		"@types/express": "^5.0.5",
+		"ts-node": "^10.9.2",
+		"typescript": "^5.9.3",
+		"wrangler": "^4.45.0"
+	},
+	"version": "1.0.0",
+	"description": "```txt npm install npm run dev ```",
+	"main": "index.js",
+	"keywords": [],
+	"author": "",
+	"license": "ISC"
+>>>>>>> e9b5529372d02d142c0f7459b55d983ffcfeeb54
 }
