@@ -1,8 +1,13 @@
 @import "tailwindcss";
 
+/* === COLOR + FONT VARIABLES === */
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --brand-purple: #7c3aed;
+  --brand-purple-light: #ede9fe;
+  --brand-gray: #f9fafb;
+  --brand-text: #374151;
 }
 
 @theme inline {
@@ -12,6 +17,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* === DARK MODE === */
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -19,8 +25,164 @@
   }
 }
 
+/* === BASE BODY === */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  @apply antialiased;
+}
+
+/* =============================== */
+/* PROMOHUBAI GLOBAL FORM STYLES  */
+/* =============================== */
+
+.form-card {
+  @apply bg-white dark:bg-neutral-900 p-8 rounded-2xl shadow-md w-full max-w-lg;
+}
+
+.form-title {
+  @apply text-3xl font-bold text-purple-600 mb-6 text-center;
+}
+
+.form-label {
+  @apply block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1;
+}
+
+.form-input,
+.form-textarea,
+.form-select {
+  @apply w-full border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2
+  focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400
+  bg-white dark:bg-neutral-800 text-gray-900 dark:text-gray-100 transition;
+}
+
+.form-input[disabled],
+.form-select[disabled] {
+  @apply bg-gray-100 dark:bg-neutral-700 cursor-not-allowed text-gray-500;
+}
+
+.btn-primary {
+  @apply w-full bg-purple-600 text-white py-3 rounded-lg font-semibold
+  hover:bg-purple-700 hover:shadow-lg transition-all;
+}
+
+.btn-secondary {
+  @apply w-full bg-purple-100 text-purple-700 py-3 rounded-lg font-semibold
+  hover:bg-purple-200 border border-purple-200 transition-all
+  dark:bg-neutral-800 dark:text-purple-300 dark:hover:bg-neutral-700;
+}
+
+.text-muted {
+  @apply text-sm text-gray-500 dark:text-gray-400;
+}
+
+.text-error {
+  @apply text-red-600 text-sm;
+}
+
+.form-grid-2 {
+  @apply grid grid-cols-2 gap-3;
+}
+
+.form-grid-3 {
+  @apply grid grid-cols-3 gap-3;
+}
+
+/* =============================== */
+/* UNIVERSAL UTILITY LAYOUT       */
+/* =============================== */
+
+.page-container {
+  @apply flex justify-center items-start min-h-screen bg-gray-50 dark:bg-neutral-950 py-12 px-4;
+}
+
+.shadow-soft {
+  @apply shadow-md hover:shadow-lg transition-all;
+}
+
+.dashboard-content {
+  @apply flex flex-col flex-1 px-8 py-10 lg:px-12;
+}
+
+.dashboard-center {
+  @apply flex justify-center;
+}
+
+/* Promo public pages */
+.promo-container {
+  @apply flex flex-col items-center min-h-screen bg-gray-50;
+}
+
+.promo-card {
+  @apply bg-white rounded-2xl shadow-lg p-6 max-w-2xl w-full mt-[-40px] relative z-10;
+}
+
+/* =============================== */
+/* ADMIN DASHBOARD TABLE STANDARD */
+/* =============================== */
+
+.table-wrapper {
+  @apply overflow-hidden rounded-xl shadow border border-gray-200 bg-white;
+}
+
+.custom-table {
+  @apply min-w-full divide-y divide-gray-200;
+}
+
+.custom-table thead th {
+  @apply bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap;
+}
+
+.custom-table tbody td {
+  @apply px-4 py-2 text-sm text-gray-800 whitespace-nowrap;
+}
+
+.custom-table tbody tr:hover {
+  @apply bg-gray-50;
+}
+
+/* BADGES */
+
+.badge {
+  @apply px-2 py-1 text-xs rounded font-medium;
+}
+
+.badge-green {
+  @apply bg-green-100 text-green-800;
+}
+
+.badge-blue {
+  @apply bg-blue-100 text-blue-800;
+}
+
+.badge-yellow {
+  @apply bg-yellow-100 text-yellow-800;
+}
+
+.badge-gray {
+  @apply bg-gray-200 text-gray-800;
+}
+
+/* DELETE BUTTON */
+
+.btn-danger {
+  @apply px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition;
+}
+
+/* ==== Debug Panel (Global Reusable Component Style) ==== */
+
+.debug-panel {
+  background: #f5f5f5;         /* light gray */
+  color: #4b5563;              /* tailwind gray-600 */
+  font-size: 0.75rem;          /* text-xs */
+  padding: 0.75rem;            /* p-3 */
+  border-radius: 0.5rem;       /* rounded-lg */
+  border: 1px solid #e5e7eb;   /* border-gray-200 */
+  white-space: pre-wrap;       /* preserve formatting */
+  max-height: 12rem;           /* ~48 Tailwind */
+  overflow: auto;              /* scroll if too long */
+  text-align: left;            /* like logs */
+  margin-top: 0.75rem;         /* mt-3 */
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }

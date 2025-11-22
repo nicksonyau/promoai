@@ -31,8 +31,8 @@ export default function Register() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-50 px-4">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
-        <h2 className="text-3xl font-bold text-purple-600 mb-4">Create your account</h2>
-        <p className="text-gray-600 mb-6">Start using PromoAI to generate promotional content.</p>
+        <h2 className="text-3xl font-bold text-purple-600 mb-4">Register an account</h2>
+        <p className="text-gray-600 mb-6">Start using PromoHubAI to generate promotional content.</p>
 
         <form onSubmit={handleRegister} className="space-y-5">
           <div>

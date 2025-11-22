@@ -1,18 +1,32 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { API_URL } from "@/config";
+import toast from "react-hot-toast";
 
 export default function Login() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [message, setMessage] = useState<string>("");
   const [loading, setLoading] = useState(false);
+
+  // ✅ Show contextual toasts based on redirected query params
+  useEffect(() => {
+    const verifySent = searchParams.get("verify");
+    const verified = searchParams.get("verified");
+
+    if (verifySent === "sent") {
+      toast.success("📩 Verification email sent! Please check your inbox.");
+    }
+    if (verified === "1") {
+      toast.success("✅ Your email has been verified! You can now log in.");
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setMessage("");
     setLoading(true);
 
     try {
@@ -24,21 +38,19 @@ export default function Login() {
 
       const data = await res.json().catch(() => ({}));
 
-      // Backend returns { success: true, user } on success, 401 with { error } on fail
       if (res.ok && data?.success) {
-        // temp session: store user; later replace with JWT/cookie
         if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
 
-        setMessage("Login successful ✅");
-        // Use replace to avoid going back to login on back button
+        toast.success("🎉 Login successful! Redirecting...");
         router.replace("/dashboard");
         return;
       }
 
-      // server gave an error (e.g., 401)
-      setMessage(data?.error || "Invalid email or password");
+      // ❌ Invalid login
+      toast.error(data?.error || "Invalid email or password.");
     } catch (err) {
-      setMessage("Error connecting to server");
+      console.error("[FRONT] Login error:", err);
+      toast.error("⚠️ Unable to connect to the server.");
     } finally {
       setLoading(false);
     }
@@ -49,7 +61,8 @@ export default function Login() {
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md">
         <h2 className="text-3xl font-bold text-purple-600 mb-4">Login</h2>
         <p className="text-gray-600 mb-6">
-          Welcome back to PromoAI! Please login.
+          Welcome back to{" "}
+          <span className="font-semibold text-purple-500">PromoHubAI</span>!
         </p>
 
         <form onSubmit={handleLogin} className="space-y-5">
@@ -66,6 +79,7 @@ export default function Login() {
               required
             />
           </div>
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Password
@@ -79,6 +93,7 @@ export default function Login() {
               required
             />
           </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -96,10 +111,6 @@ export default function Login() {
             Register here
           </a>
         </div>
-
-        {message && (
-          <p className="mt-4 text-center text-gray-700">{message}</p>
-        )}
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 
 export const metadata: Metadata = {
   title: "PromoAI",
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="antialiased bg-gray-50">{children}</body>
+      <body className="antialiased bg-gray-50">
+        {children}
+        <Toaster position="top-right" /> {/* ✅ pop up alert enabled globally */}
+      </body>
     </html>
   );
 }

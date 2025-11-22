@@ -1,0 +1,27 @@
+{
+  "register": {
+    "title": "Daftar akaun",
+    "subtitle": "Mula menggunakan PromoHubAI untuk menjana kandungan promosi.",
+    "first_name": "Nama Pertama",
+    "last_name": "Nama Akhir",
+    "business_name": "Nama Perniagaan",
+    "prompt_message": "Mesej anda kepada pelanggan",
+    "first_name_placeholder": "Nama pertama",
+    "last_name_placeholder": "Nama akhir",
+    "business_name_placeholder": "Nama perniagaan anda",
+    "prompt_message_placeholder": "Tulis mesej alu-aluan ringkas...",
+    "email": "Alamat emel",
+    "password": "Kata laluan (min 8 aksara)",
+    "signup": "Daftar",
+    "have_account": "Sudah mempunyai akaun?",
+    "login_here": "Log masuk di sini",
+    "required": "Medan ini diperlukan"
+  },
+
+  "errors": {
+    "EMAIL_REQUIRED": "Emel dan kata laluan diperlukan.",
+    "NAME_REQUIRED": "Nama pertama dan nama akhir diperlukan.",
+    "USER_EXISTS": "Pengguna dengan emel ini sudah wujud.",
+    "SERVER_ERROR": "Ralat telah berlaku. Sila cuba lagi nanti."
+  }
+}

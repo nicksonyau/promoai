@@ -1,0 +1,27 @@
+{
+  "register": {
+    "title": "注册账号",
+    "subtitle": "开始使用 PromoHubAI 生成营销内容。",
+    "first_name": "名字",
+    "last_name": "姓氏",
+    "business_name": "商家名称",
+    "prompt_message": "给顾客的留言",
+    "first_name_placeholder": "请输入名字",
+    "last_name_placeholder": "请输入姓氏",
+    "business_name_placeholder": "请输入商家名称",
+    "prompt_message_placeholder": "写一段欢迎语...",
+    "email": "电子邮箱",
+    "password": "密码（至少 8 个字符）",
+    "signup": "注册",
+    "have_account": "已经有账号？",
+    "login_here": "点击登录",
+    "required": "此字段为必填项"
+  },
+
+  "errors": {
+    "EMAIL_REQUIRED": "必须填写电子邮箱和密码。",
+    "NAME_REQUIRED": "必须填写名字和姓氏。",
+    "USER_EXISTS": "该电子邮箱已被注册。",
+    "SERVER_ERROR": "服务器错误，请稍后再试。"
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "register": {
+    "title": "Register an account",
+    "subtitle": "Start using PromoHubAI to generate promotional content.",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "business_name": "Business Name",
+    "prompt_message": "Your message to customers",
+    "first_name_placeholder": "First name",
+    "last_name_placeholder": "Last name",
+    "business_name_placeholder": "Your business name",
+    "prompt_message_placeholder": "Write a short welcome message...",
+    "email": "Email address",
+    "password": "Password (min 8 characters)",
+    "signup": "Sign Up",
+    "have_account": "Already have an account?",
+    "login_here": "Login here",
+    "required": "This field is required"
+  },
+
+  "errors": {
+    "EMAIL_REQUIRED": "Email and password are required.",
+    "NAME_REQUIRED": "First name and last name are required.",
+    "USER_EXISTS": "A user with this email already exists.",
+    "ACCOUNT_NOT_VERIFIED": "Your account is not verified. Please check your email.",
+    "ACCOUNT_SUSPENDED": "This account is suspended. Contact support.",
+    "ACCOUNT_DISABLED": "This account has been disabled.",
+    "create_failed": "Failed to create store.",
+    "SERVER_ERROR": "Something went wrong. Please try again later."
+  },
+
+  "admin_users": {
+    "title": "User Dashboard",
+    "id": "ID",
+    "email": "Email",
+    "name": "Name",
+    "role": "Role",
+    "status": "Status",
+    "created_at": "Created At",
+    "actions": "Actions",
+    "delete": "Delete",
+    "confirm_delete": "Delete user",
+    "delete_failed": "Delete failed ❌",
+    "deleted_success": "User deleted successfully ✅",
+    "no_users": "No users found.",
+    "prev": "Previous",
+    "next": "Next",
+    "page": "Page"
+  },
+
+  "login": {
+    "title": "Login",
+    "subtitle": "Welcome back to",
+    "email": "Email address",
+    "password": "Password",
+    "login_button": "Login",
+    "loading": "Signing in...",
+    "no_account": "Don’t have an account?",
+    "register_here": "Register here",
+    "success": "🎉 Login successful! Redirecting...",
+    "invalid": "Invalid email or password.",
+    "verify_sent": "📩 Verification email sent! Please check your inbox.",
+    "verified": "✅ Your email has been verified!"
+  },
+
+  "store": {
+    "create_title": "Create New Store",
+    "create_subtitle": "Set up your brand, menu, contact info and publish your AI-powered promo site.",
+    "validation": {
+      "brand_required": "Brand name is required.",
+      "logo_required": "Please upload a brand logo.",
+      "hero_required": "Please upload a hero banner image.",
+      "product_required": "Please add at least one product.",
+      "product_name_required": "Each product must have a name.",
+      "product_price_invalid": "Each product must have a valid numeric price."
+    }
+  },
+
+  "campaign": {
+    "new_title": "New Promotion",
+    "for_store": "For store",
+
+    "select_store_title": "Select Store",
+    "no_stores": "You have no stores yet. Create a store first.",
+
+    "tab": {
+      "basic": "Basic",
+      "products": "Products",
+      "cta": "CTA",
+      "preview_publish": "Preview / Publish"
+    },
+
+    "label": {
+      "type": "Promotion Type",
+      "banner": "Campaign Banner",
+      "start_date": "Start Date",
+      "end_date": "End Date"
+    },
+
+    "placeholder": {
+      "title": "Promotion Title",
+      "description": "Describe the promotion"
+    },
+
+    "type": {
+      "discount": "Percentage Discount",
+      "b1f1": "Buy 1 Free 1",
+      "voucher": "Voucher / Cashback",
+      "seasonal": "Seasonal Campaign",
+      "flashdeal": "Flash Deal"
+    },
+
+    "cta": {
+      "whatsapp": "WhatsApp Number (e.g. 60123456789)",
+      "order_url": "Order URL (Grab/FoodPanda/Website)"
+    },
+
+    "validation": {
+      "select_store": "Please select a store first.",
+      "title_required": "Please provide a title (3+ characters).",
+      "whatsapp_invalid": "WhatsApp number looks invalid.",
+      "date_range": "Start date must be before end date.",
+      "product_required": "Product name and promo price are required."
+    },
+
+    "product_name": "Product Name",
+    "product_org_price": "Original Price",
+    "product_promo_price": "Promo Price",
+
+    "currency_prefix": "RM",
+    "was": "was",
+
+    "button": {
+      "add_product": "Add Product",
+      "delete": "Delete",
+      "copy": "Copy",
+      "claim_voucher": "Claim Voucher",
+      "open_public": "Open Public Promo"
+    },
+
+    "published": "Promotion Published 🎉",
+    "public_link": "Your public promo link:",
+    "copied": "Link copied!",
+    "save_first": "Save your campaign first to generate a public link.",
+    "publishing": "Publishing...",
+    "publish": "Publish Promotion",
+
+    "success": {
+      "created": "Promotion created successfully 🎉"
+    },
+
+    "errors": {
+      "create_failed": "Failed to create campaign.",
+      "invalid_response": "Invalid response from server."
+    },
+
+    "voucher": {
+      "claimed": "🎁 Voucher claimed!"
+    },
+
+    "option": {
+      "flatten_r2": "Use flattened R2 layout (optional)"
+    }
+  }
+}
