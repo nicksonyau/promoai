@@ -2,7 +2,42 @@ name = "promoaiapi"
 main = "src/index.ts"
 compatibility_date = "2025-10-24"
 
+# ✅ Cloudflare AI binding (fixes env.AI undefined)
+[ai]
+binding = "AI"
+
+#######################
+# ✅ KV BINDINGS
+#######################
+
 [[kv_namespaces]]
-binding = "KV"   # ✅ must match env.KV in code
+binding = "KV"
 id = "feb043d71025470f8d1574f9cf956bce"
-preview_id = "feb043d71025470f8d1574f9cf956bce"
+preview_id = "509dac053e074528b70ba435570cb692"
+
+[[kv_namespaces]]
+binding = "chatbotconfig"
+id = "74c6f7f63a64409bb7fa72e19634702a"
+preview_id = "eb030b960a51434abd05078c9a3bf6e5"
+
+[[kv_namespaces]]
+binding = "CHAT_HISTORY_KV"
+id = "07873452db4345498eada0048035fd2c"
+preview_id = "f100354a6b9740519b0cd656760a6459"
+
+[[kv_namespaces]]
+binding = "USERS"
+id = "e29ffb3d348c439cae7475db210b8422" # <-- from wrangler kv list
+preview_id = "04b7f1d29d0e444ab480225406e6df51" # <-- preview
+
+[vars]
+RESEND_API_KEY = "re_V6chGrq3_A5hE8nvaXc48cCKke8e13sBN"
+FRONTEND_URL = "http://localhost:3000"
+WORKER_URL = "http://127.0.0.1:8787"
+
+
+[[r2_buckets]]
+binding = "MY_R2_BUCKET"
+bucket_name = "promoai-images"          # Production bucket
+preview_bucket_name = "promoai-images-dev"   # Dev bucket created just now
+
