@@ -10,72 +10,73 @@ export default function CreateStorePage() {
   const router = useRouter();
   const params = useParams();
 
-  // 🔤 Locale & translations (same pattern as LoginPage)
+  // Locale
   const lang = (params?.lang as string) || "en";
   const { t } = useTranslations(lang);
-
-  // 🚏 Locale-aware URL builder
   const to = (path: string) => `/${lang}${path}`;
 
   const [saving, setSaving] = useState(false);
-  const [product, setProduct] = useState({ name: "", price: "", img: "" });
 
-  // Default store structure
+  const [product, setProduct] = useState({
+    name: "",
+    price: "",
+    img: "",
+  });
+
+  // Default structure (unchanged)
   const [form, setForm] = useState({
     brand: "",
     tagline: "",
     templateId: "restaurant",
+    slug: "",
+    publicUrl: "",
+    sectionsEnabled: ["brand", "about", "products", "services", "gallery", "contact"],
     sections: {
       brand: { logo: "", heroImage: "" },
       about: { story: "" },
-      menu: [] as Array<{ name: string; price: number; img?: string }>,
+      menu: [
+        {
+          sectionName: "Menu",
+          items: [] as Array<{ name: string; price: number; img?: string }>,
+        },
+      ],
       contact: { phone: "", email: "", address: "", mapUrl: "", hours: "" },
       social: { instagram: "", facebook: "", tiktok: "", whatsapp: "" },
+      services: [],
+      gallery: [],
     },
   });
 
-  // ------------------------
-  // SUBMIT HANDLER + VALIDATION
-  // ------------------------
+  // -------------------------------
+  // SUBMIT HANDLER (WITH AUTH FIX)
+  // -------------------------------
   const submit = async () => {
-    // Brand required
-    if (!form.brand.trim()) {
-      alert(t("store.validation.brand_required"));
-      return;
-    }
+    // validation
+    if (!form.brand.trim()) return alert(t("store.validation.brand_required"));
+    if (!form.sections.brand.logo) return alert(t("store.validation.logo_required"));
+    if (!form.sections.brand.heroImage) return alert(t("store.validation.hero_required"));
 
-    // Logo required
-    if (!form.sections.brand.logo) {
-      alert(t("store.validation.logo_required"));
-      return;
-    }
+    const menu = form.sections.menu ?? [];
+    const firstSection = menu[0] ?? { items: [] };
+    const items = firstSection.items ?? [];
 
-    // Hero banner required
-    if (!form.sections.brand.heroImage) {
-      alert(t("store.validation.hero_required"));
-      return;
-    }
-
-    // At least one product
-    if (form.sections.menu.length === 0) {
+    if (items.length === 0) {
       alert(t("store.validation.product_required"));
       return;
     }
 
-    // Per-product validation
-    for (const item of form.sections.menu) {
-      if (!item.name || !item.name.trim()) {
-        alert(t("store.validation.product_name_required"));
-        return;
-      }
-      if (
-        item.price === undefined ||
-        item.price === null ||
-        isNaN(Number(item.price))
-      ) {
-        alert(t("store.validation.product_price_invalid"));
-        return;
-      }
+    for (const item of items) {
+      if (!item.name?.trim()) return alert(t("store.validation.product_name_required"));
+      if (isNaN(Number(item.price))) return alert(t("store.validation.product_price_invalid"));
+    }
+
+    // ---------------------------
+    // NEW: AUTH HEADER REQUIRED
+    // ---------------------------
+    const token = localStorage.getItem("sessionToken");
+    if (!token) {
+      alert("Missing session token. Please login again.");
+      return;
     }
 
     setSaving(true);
@@ -83,24 +84,22 @@ export default function CreateStorePage() {
     try {
       const res = await fetch(`${API_URL}/store/create`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`, // 🔥 FIXED
+        },
         body: JSON.stringify(form),
       });
 
       const data = await res.json().catch(() => ({}));
-
       setSaving(false);
 
       if (res.ok && data.success && data.store?.id) {
-        // ✅ Locale-aware redirect
         router.push(to(`/dashboard/store/${data.store.id}`));
         return;
       }
 
-      alert(
-        data.error ||
-          t("store.errors.create_failed")
-      );
+      alert(data.error || t("store.errors.create_failed"));
     } catch (err) {
       console.error("Store creation error:", err);
       setSaving(false);
@@ -110,17 +109,13 @@ export default function CreateStorePage() {
 
   return (
     <div className="w-full min-h-screen bg-gray-50 px-8 py-10">
-      {/* Page Header */}
       <div className="mb-10">
         <h1 className="text-4xl font-bold text-purple-700">
           {t("store.create_title")}
         </h1>
-        <p className="text-gray-500 mt-1">
-          {t("store.create_subtitle")}
-        </p>
+        <p className="text-gray-500 mt-1">{t("store.create_subtitle")}</p>
       </div>
 
-      {/* Store Form */}
       <StoreForm
         form={form}
         setForm={setForm}

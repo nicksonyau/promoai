@@ -5,6 +5,8 @@ import { API_URL } from "@/config";
 import toast from "react-hot-toast";
 
 interface User {
+  id?: string;
+  companyId?: string;
   email: string;
   firstName?: string;
   lastName?: string;
@@ -31,16 +33,23 @@ export default function ProfilePage() {
     async function fetchUser() {
       setLoading(true);
       try {
-        const res = await fetch(`${API_URL}/user/me?email=${encodeURIComponent(localUser.email)}`);
+        const res = await fetch(
+          `${API_URL}/user/me?email=${encodeURIComponent(localUser.email)}`
+        );
         const data = await res.json();
-        if (res.ok && data.user) setUser(data.user);
-        else toast.error(data.error || "Failed to fetch profile");
+
+        if (res.ok && data.user) {
+          setUser(data.user);
+        } else {
+          toast.error(data.error || "Failed to fetch profile");
+        }
       } catch {
         toast.error("Network error");
       } finally {
         setLoading(false);
       }
     }
+
     fetchUser();
   }, []);
 
@@ -69,7 +78,6 @@ export default function ProfilePage() {
     }
   };
 
-  // ✅ Send password reset
   const handlePasswordReset = async () => {
     if (!user?.email) return;
     try {
@@ -101,6 +109,13 @@ export default function ProfilePage() {
 
           {user && (
             <form onSubmit={handleSave} className="space-y-4">
+
+              {/* NEW: User ID + Company ID */}
+              <div className="p-4 bg-gray-100 border rounded-lg mb-4 text-sm text-gray-700">
+                <p><strong>User ID:</strong> {user.id || "—"}</p>
+                <p><strong>Company ID:</strong> {user.companyId || "—"}</p>
+              </div>
+
               {/* Email */}
               <div>
                 <label className="form-label">Email</label>
@@ -157,15 +172,6 @@ export default function ProfilePage() {
                     <option value="+63">🇵🇭 Philippines (+63)</option>
                     <option value="+84">🇻🇳 Vietnam (+84)</option>
                     <option value="+1">🇺🇸 United States (+1)</option>
-                    <option value="+44">🇬🇧 United Kingdom (+44)</option>
-                    <option value="+91">🇮🇳 India (+91)</option>
-                    <option value="+81">🇯🇵 Japan (+81)</option>
-                    <option value="+82">🇰🇷 South Korea (+82)</option>
-                    <option value="+86">🇨🇳 China (+86)</option>
-                    <option value="+852">🇭🇰 Hong Kong (+852)</option>
-                    <option value="+886">🇹🇼 Taiwan (+886)</option>
-                    <option value="+971">🇦🇪 UAE (+971)</option>
-                    <option value="+61">🇦🇺 Australia (+61)</option>
                   </select>
                 </div>
 

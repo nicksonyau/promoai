@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-<<<<<<< HEAD
     "target": "ES2017",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
@@ -33,20 +32,3 @@
   ],
   "exclude": ["node_modules"]
 }
-=======
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "skipLibCheck": true,
-    "lib": [
-      "ESNext"
-    ],
-    "jsx": "react-jsx",
-    "jsxImportSource": "hono/jsx",
-    "types": [
-        "./worker-configuration.d.ts"
-    ]
-  },
-}
->>>>>>> e9b5529372d02d142c0f7459b55d983ffcfeeb54

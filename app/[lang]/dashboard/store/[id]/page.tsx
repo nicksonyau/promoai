@@ -24,42 +24,42 @@ export default function EditStorePage() {
     brand: "",
     tagline: "",
     templateId: "restaurant",
-
+    companyId: "",                     // ⭐ added
     sections: {
       brand: { logo: "", heroImage: "" },
       about: { story: "" },
       menu: [],
       services: [],
       gallery: [],
-      contact: {
-        phone: "",
-        email: "",
-        address: "",
-        mapUrl: "",
-        hours: "",
-      },
-      social: {
-        instagram: "",
-        facebook: "",
-        tiktok: "",
-        whatsapp: "",
-      },
+      contact: { phone: "", email: "", address: "", mapUrl: "", hours: "" },
+      social: { instagram: "", facebook: "", tiktok: "", whatsapp: "" },
     },
-
     sectionsEnabled: ["brand", "about", "products", "services", "gallery", "contact"],
   });
 
   const [product, setProduct] = useState({ name: "", price: "", img: "" });
 
-  // --------------------------------------------------
+  // R2 resolver
+  const resolveImage = (url?: string) => {
+    if (!url) return "";
+    if (url.startsWith("http")) return url;
+    if (url.startsWith("/r2/")) return `${API_URL}${url}`;
+    return url;
+  };
+
   // LOAD STORE DATA
-  // --------------------------------------------------
   useEffect(() => {
     if (!id) return;
 
     async function load() {
       try {
-        const res = await fetch(`${API_URL}/store/${id}`, { cache: "no-store" });
+        const token = localStorage.getItem("sessionToken");
+
+        const res = await fetch(`${API_URL}/store/${id}`, {
+          cache: "no-store",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         const data = await res.json();
 
         if (!data?.store) {
@@ -70,11 +70,8 @@ export default function EditStorePage() {
 
         let store = data.store;
 
-        // ---------------------------
-        // NORMALIZE sections object
-        // ---------------------------
+        // normalize
         store.sections = store.sections ?? {};
-
         store.sections.brand = store.sections.brand ?? { logo: "", heroImage: "" };
         store.sections.about = store.sections.about ?? { story: "" };
         store.sections.services = store.sections.services ?? [];
@@ -93,49 +90,40 @@ export default function EditStorePage() {
           whatsapp: "",
         };
 
-        // ---------------------------
-        // NORMALIZE MENU FORMAT
-        // ---------------------------
+        // Menu fix
         if (!store.sections.menu) {
-          store.sections.menu = [];
+          store.sections.menu = [{ sectionName: "Menu", items: [] }];
         } else if (
           Array.isArray(store.sections.menu) &&
           store.sections.menu.length > 0 &&
           !store.sections.menu[0].items
         ) {
           store.sections.menu = [
-            {
-              sectionName: "Menu",
-              items: store.sections.menu,
-            },
+            { sectionName: "Menu", items: store.sections.menu },
           ];
         }
 
-        // ---------------------------
-        // SAFE NORMALIZATION of sectionsEnabled
-        // supports: null, undefined, [{key:"about"}], ["about"], [null]
-        // ---------------------------
-        let enabled = store.sectionsEnabled;
+        // sectionsEnabled normalize
+        let enabled = store.sectionsEnabled || [];
+        if (!Array.isArray(enabled)) enabled = [];
+        enabled = enabled
+          .filter((e) => e)
+          .map((e: any) => (typeof e === "string" ? e : e?.key))
+          .filter(Boolean);
 
-        if (!Array.isArray(enabled)) {
-          enabled = [];
-        } else {
-          enabled = enabled
-            .filter((e: any) => e !== null && e !== undefined)
-            .map((e: any) => {
-              if (typeof e === "string") return e;
-              if (e && typeof e.key === "string") return e.key;
-              return null;
-            })
-            .filter(Boolean);
-        }
-
-        // Ensure required section
         if (!enabled.includes("brand")) enabled.unshift("brand");
-
-        // Default if empty
-        if (enabled.length === 0) {
+        if (enabled.length === 0)
           enabled = ["brand", "about", "products", "services", "gallery", "contact"];
+
+        // Fix image URLs
+        store.sections.brand.logo = resolveImage(store.sections.brand.logo);
+        store.sections.brand.heroImage = resolveImage(store.sections.brand.heroImage);
+
+        if (store.sections.menu?.[0]?.items) {
+          store.sections.menu[0].items = store.sections.menu[0].items.map((it: any) => ({
+            ...it,
+            img: resolveImage(it.img),
+          }));
         }
 
         setForm({
@@ -147,7 +135,7 @@ export default function EditStorePage() {
         setLoading(false);
       } catch (err) {
         console.error("[STORE LOAD ERROR]", err);
-        alert("Something went wrong. Please try again later.");
+        alert("Failed to load store");
         setLoading(false);
       }
     }
@@ -155,9 +143,6 @@ export default function EditStorePage() {
     load();
   }, [id]);
 
-  // --------------------------------------------------
-  // DELETE IMAGE
-  // --------------------------------------------------
   const deleteImage = (path: string) => {
     setForm((prev: any) => {
       const updated = structuredClone(prev);
@@ -170,71 +155,75 @@ export default function EditStorePage() {
     });
   };
 
-  // --------------------------------------------------
-  // VALIDATION
-  // --------------------------------------------------
-  const validateForm = () => {
+  const validate = () => {
     if (!form.brand.trim()) return "Brand name required.";
     if (!form.sections.brand.logo) return "Logo required.";
     if (!form.sections.brand.heroImage) return "Hero banner required.";
 
-    if (form.sectionsEnabled.includes("products")) {
-      const menu = form.sections.menu?.[0]?.items || [];
-      if (menu.length === 0) return "At least one menu item required.";
-      for (const item of menu) {
-        if (!item.name?.trim()) return "Menu item must have a name.";
-        if (isNaN(Number(item.price))) return "Menu item price must be digits.";
-      }
+    const menu = form.sections.menu?.[0]?.items || [];
+    if (menu.length === 0) return "At least one menu item required.";
+
+    for (const item of menu) {
+      if (!item.name?.trim()) return "Menu item name required.";
+      if (isNaN(Number(item.price))) return "Menu item price invalid.";
     }
 
     return null;
   };
 
-  // --------------------------------------------------
-  // SUBMIT
-  // --------------------------------------------------
   const submit = async () => {
-    const error = validateForm();
+    const error = validate();
     if (error) return alert(error);
 
     setSaving(true);
+
     try {
+      const token = localStorage.getItem("sessionToken");
+
       const res = await fetch(`${API_URL}/store/update/${form.id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify(form),
       });
 
       const data = await res.json();
       setSaving(false);
 
-      if (!res.ok || !data.success) {
-        console.error("[UPDATE FAILED]", data);
+      if (!data.success) {
         alert("Update failed");
         return;
       }
 
       router.push(to(`/dashboard/store/${form.id}`));
     } catch (err) {
-      console.error("[STORE UPDATE ERROR]", err);
+      console.error(err);
       alert("Server error");
       setSaving(false);
     }
   };
 
-  if (loading) {
-    return <div className="p-8 text-gray-500">Loading...</div>;
-  }
+  if (loading) return <div className="p-8 text-gray-500">Loading...</div>;
 
   return (
-    <StoreForm
-      form={form}
-      setForm={setForm}
-      product={product}
-      setProduct={setProduct}
-      deleteImage={deleteImage}
-      saving={saving}
-      onSubmit={submit}
-    />
+    <>
+      {/* ⭐ SHOW companyId + storeId */}
+      <div className="p-4 mb-6 bg-gray-100 rounded-lg border text-gray-700">
+        <div><b>Store ID:</b> {form.id}</div>
+        <div><b>Company ID:</b> {form.companyId || "—"}</div>
+      </div>
+
+      <StoreForm
+        form={form}
+        setForm={setForm}
+        product={product}
+        setProduct={setProduct}
+        deleteImage={deleteImage}
+        saving={saving}
+        onSubmit={submit}
+      />
+    </>
   );
 }

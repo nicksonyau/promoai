@@ -49,7 +49,29 @@ export default function LoginPage() {
       const data = await res.json().catch(() => ({}));
 
       if (res.ok && data?.success) {
-        if (data.user) localStorage.setItem("user", JSON.stringify(data.user));
+        if (data.user) {
+          // Save full user object (existing)
+          localStorage.setItem("user", JSON.stringify(data.user));
+
+          const companyId = data.user.companyId;
+          if (companyId) {
+            localStorage.setItem("companyId", companyId);
+            console.log("[Login] companyId:", companyId);
+          } else {
+            console.warn("[Login] No companyId received in user object");
+          }
+        }
+
+        // ---------------------------------------------------
+        // 🔥 NEW: Save session token for Authorization header
+        // ---------------------------------------------------
+        if (data.token) {
+          localStorage.setItem("sessionToken", data.token);
+          console.warn("[Login] Session token:", data.token);
+        } else {
+          console.warn("[Login] No session token returned from server");
+        }
+
         toast.success(t("login.success"));
         router.replace(`/${lang}/dashboard`);
         return;
@@ -68,7 +90,8 @@ export default function LoginPage() {
       <Card>
         <h2 className="form-title">{t("login.title")}</h2>
         <p className="text-muted text-center mb-6">
-          {t("login.subtitle")} <span className="text-purple-600 font-semibold">PromoHubAI</span>
+          {t("login.subtitle")}{" "}
+          <span className="text-purple-600 font-semibold">PromoHubAI</span>
         </p>
 
         <form onSubmit={handleLogin} className="space-y-5">

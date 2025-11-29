@@ -25,28 +25,53 @@ export default function StoreListPage() {
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState<string | null>(null);
 
-  // ------------------------------------------
-  // Fetch all stores
-  // ------------------------------------------
+  // -----------------------------------------------------
+  // 🔥 FIX: R2 IMAGE RESOLVER (critical for thumbnails)
+  // -----------------------------------------------------
+  const resolveImageUrl = (url?: string | null) => {
+    if (!url) return "";
+    if (url.startsWith("http")) return url;
+    if (url.startsWith("/r2/")) return `${API_URL}${url}`;
+    return url;
+  };
+
+  // -----------------------------------------------------
+  // Fetch all stores (multi-tenant + auth)
+  // -----------------------------------------------------
   useEffect(() => {
     async function fetchStores() {
       try {
-        const res = await fetch(`${API_URL}/stores`);
-        if (!res.ok) throw new Error("Failed to fetch store list");
+        const token = localStorage.getItem("sessionToken");
+
+        if (!token) {
+          console.error("❌ No session token found.");
+          throw new Error("Unauthorized");
+        }
+
+        const res = await fetch(`${API_URL}/store/list`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) {
+          console.error("❌ Store list error:", await res.text());
+          throw new Error("Failed to fetch store list");
+        }
 
         const data = await res.json();
-        console.log("🧠 [PromoHubAI] Raw API Data:", data);
+        console.log("🧠 [PromoHubAI] Raw Store List Data:", data);
 
         const mappedStores =
           data?.stores?.map((s: any) => ({
             id: s.id,
             name: s.brand,
-            template: s.templateId || "restaurant",
+            template: s.template || "restaurant",
             tagline: s.tagline || "",
             updatedAt: s.createdAt
               ? new Date(s.createdAt).toLocaleString()
               : "N/A",
-            logo: s.logo || "/images/default-logo.png",
+            logo: resolveImageUrl(s.logoUrl),
           })) || [];
 
         setStores(mappedStores);
@@ -57,12 +82,13 @@ export default function StoreListPage() {
       }
     }
 
-    fetchStores();
+    // 🔥 Wait for token (fix for first-load blank)
+    setTimeout(fetchStores, 150);
   }, []);
 
-  // ------------------------------------------
+  // -----------------------------------------------------
   // Delete store
-  // ------------------------------------------
+  // -----------------------------------------------------
   const handleDelete = async (id: string, name: string) => {
     const confirmed = confirm(`Are you sure you want to delete "${name}"?`);
     if (!confirmed) return;
@@ -70,8 +96,13 @@ export default function StoreListPage() {
     setDeleting(id);
 
     try {
+      const token = localStorage.getItem("sessionToken");
+
       const res = await fetch(`${API_URL}/store/delete/${id}`, {
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!res.ok) throw new Error("Failed to delete store");
@@ -86,9 +117,9 @@ export default function StoreListPage() {
     }
   };
 
-  // ------------------------------------------
+  // -----------------------------------------------------
   // Loading state
-  // ------------------------------------------
+  // -----------------------------------------------------
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen text-gray-500">
@@ -97,9 +128,9 @@ export default function StoreListPage() {
     );
   }
 
-  // ------------------------------------------
-  // UI Render
-  // ------------------------------------------
+  // -----------------------------------------------------
+  // UI
+  // -----------------------------------------------------
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-6xl mx-auto px-6 py-16">
@@ -128,7 +159,7 @@ export default function StoreListPage() {
               {/* Thumbnail */}
               <div className="relative">
                 <img
-                  src={store.logo}
+                  src={resolveImageUrl(store.logo)}
                   alt={store.name}
                   className="w-full h-48 object-cover"
                 />

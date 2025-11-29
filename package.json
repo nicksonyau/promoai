@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "name": "promoai",
   "version": "0.1.0",
   "private": true,
@@ -10,10 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@heroicons/react": "^2.2.0",
     "@next/font": "^14.2.15",
     "lucide-react": "^0.548.0",
     "next": "16.0.0",
+    "pdfjs-dist": "^3.11.174",
     "qrcode.react": "^4.2.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
@@ -29,30 +28,4 @@
     "tailwindcss": "^4",
     "typescript": "^5"
   }
-=======
-	"name": "promoaiapi",
-	"type": "module",
-	"scripts": {
-		"dev": "wrangler dev",
-		"deploy": "wrangler deploy --minify",
-		"cf-typegen": "wrangler types --env-interface CloudflareBindings"
-	},
-	"dependencies": {
-		"express": "^5.1.0",
-		"hono": "^4.10.3",
-		"nanoid": "^5.1.6"
-	},
-	"devDependencies": {
-		"@types/express": "^5.0.5",
-		"ts-node": "^10.9.2",
-		"typescript": "^5.9.3",
-		"wrangler": "^4.45.0"
-	},
-	"version": "1.0.0",
-	"description": "```txt npm install npm run dev ```",
-	"main": "index.js",
-	"keywords": [],
-	"author": "",
-	"license": "ISC"
->>>>>>> e9b5529372d02d142c0f7459b55d983ffcfeeb54
 }

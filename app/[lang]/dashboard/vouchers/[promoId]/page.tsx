@@ -1,115 +1,162 @@
-// File: /app/dashboard/vouchers/[promoId]/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import { API_URL } from "../../../../api/config";
-import { QRCodeCanvas } from "qrcode.react";
+import { useParams, useRouter } from "next/navigation";
+import { API_URL } from "@/app/api/config";
 import toast from "react-hot-toast";
+import VoucherForm from "../components/VoucherForm";
 
-export default function VoucherDetailPage() {
+export default function VoucherEditPage() {
   const { promoId } = useParams();
-  const [loading, setLoading] = useState(false);
-  const [voucher, setVoucher] = useState<any>(null);
-  const [claims, setClaims] = useState<any[]>([]);
+  const router = useRouter();
 
-  const load = async () => {
-    setLoading(true);
+  const [token, setToken] = useState<string | null>(null);
+  const [form, setForm] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  // -----------------------------
+  // LOAD TOKEN
+  // -----------------------------
+  useEffect(() => {
     try {
-      const res = await fetch(`${API_URL}/voucher/detail?promoId=${promoId}`);
-      const data = await res.json();
-      if (res.ok && data.voucher) {
-        setVoucher(data.voucher);
-        setClaims(data.redemptions || []);
-      } else {
-        toast.error(data.error || "Failed to load");
+      const t = localStorage.getItem("sessionToken");
+      if (!t) {
+        toast.error("Not logged in");
+        router.push("/en/login");
+        return;
       }
-    } catch (e) {
-      console.error(e);
+      setToken(t);
+    } catch (err) {
+      console.error(err);
+    }
+  }, []);
+
+  // -----------------------------
+  // LOAD VOUCHER DATA
+  // -----------------------------
+  useEffect(() => {
+    if (!token || !promoId) return;
+
+    async function load() {
+      setLoading(true);
+      try {
+        const res = await fetch(`${API_URL}/voucher/detail?promoId=${promoId}`, {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          cache: "no-store",
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          toast.error(data.error || "Failed to load voucher");
+          return;
+        }
+
+        setForm(data.voucher);
+      } catch (err) {
+        console.error(err);
+        toast.error("Network error");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    load();
+  }, [token, promoId]);
+
+  // -----------------------------
+  // UPDATE HANDLER
+  // -----------------------------
+  const submitUpdate = async (body: any) => {
+    setSaving(true);
+    try {
+      const res = await fetch(`${API_URL}/voucher/update/${promoId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        toast.success("Voucher updated");
+        router.push("/en/dashboard/vouchers");
+      } else {
+        toast.error(data.error || "Update failed");
+      }
+    } catch (err) {
+      console.error(err);
       toast.error("Network error");
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
   };
 
-  useEffect(() => {
-    if (!promoId) return;
-    load();
-  }, [promoId]);
+  // -----------------------------
+  // DELETE HANDLER
+  // -----------------------------
+  const submitDelete = async () => {
+    if (!confirm("Delete this voucher? This action cannot be undone.")) return;
 
-  const claim = async () => {
+    setDeleting(true);
     try {
-      const res = await fetch(`${API_URL}/voucher/claim`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ promoId }),
+      const res = await fetch(`${API_URL}/voucher/delete/${promoId}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
+
       const data = await res.json();
-      if (res.ok && data.claim) {
-        toast.success(`Claimed ${data.claim.id}`);
+
+      if (res.ok && data.success) {
+        toast.success("Voucher deleted");
+        router.push("/en/dashboard/vouchers");
       } else {
-        toast.error(data.error || "Claim failed");
+        toast.error(data.error || "Delete failed");
       }
-    } catch (e) {
-      console.error(e);
+    } catch (err) {
+      console.error(err);
       toast.error("Network error");
+    } finally {
+      setDeleting(false);
     }
   };
 
-  if (!voucher)
+  // -----------------------------
+  // UI
+  // -----------------------------
+  if (loading || !form) {
     return (
-      <div className="p-8 text-gray-500">
-        {loading ? "Loading..." : "Voucher not found"}
+      <div className="p-8 text-gray-500 max-w-xl mx-auto">
+        Loading voucher...
       </div>
     );
+  }
 
   return (
-    <div className="p-8 max-w-3xl mx-auto">
-      <div className="bg-white rounded-xl p-6 shadow">
-        <div className="flex gap-6">
-          <div className="w-40 h-32 rounded overflow-hidden bg-gray-50">
-            {voucher.image ? (
-              <img src={voucher.image} alt={voucher.title} className="w-full h-full object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-xs text-gray-400">No image</div>
-            )}
-          </div>
+    <div className="p-8 max-w-2xl mx-auto">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-2xl font-bold text-purple-700">Edit Voucher</h1>
 
-          <div className="flex-1">
-            <h2 className="text-2xl font-semibold text-gray-800">{voucher.title}</h2>
-            <p className="text-sm text-gray-500 mt-1">{voucher.discount}{voucher.type==="percent"?"%":""}</p>
-            <p className="text-xs text-gray-400 mt-2">Quota: {voucher.quota || "unlimited"} • Claimed {voucher.claimed || 0}</p>
-
-            <div className="mt-4 flex gap-3">
-              <button onClick={claim} className="px-4 py-2 bg-purple-600 text-white rounded-md">
-                Claim
-              </button>
-              <a href={`/promo/${voucher.promoId}`} className="px-4 py-2 border rounded-md text-purple-700">Public</a>
-            </div>
-          </div>
-
-          <div className="w-40 text-center">
-            <QRCodeCanvas value={`${window.location.origin}/promo/${voucher.promoId}`} size={120} includeMargin />
-            <p className="text-xs text-gray-400 mt-2">Promo link</p>
-          </div>
-        </div>
+        <button
+          onClick={submitDelete}
+          disabled={deleting}
+          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition disabled:opacity-50"
+        >
+          {deleting ? "Deleting..." : "Delete"}
+        </button>
       </div>
 
-      {/* Redemption history (simple) */}
-      <div className="mt-6 bg-white p-4 rounded-xl shadow">
-        <h3 className="font-semibold mb-2">Recent redemptions</h3>
-        {claims.length === 0 ? (
-          <p className="text-sm text-gray-500">No redemptions yet.</p>
-        ) : (
-          <ul className="space-y-2">
-            {claims.slice(-10).reverse().map((r: any, i: number) => (
-              <li key={i} className="text-sm text-gray-600">
-                {r.code || r.id} • {r.date || r.redeemedAt || r.createdAt}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      <VoucherForm initial={form} saving={saving} onSubmit={submitUpdate} />
     </div>
   );
 }
