@@ -12,6 +12,8 @@ import {
   Settings,
   LogOut,
   ShieldCheck,
+  FileText,
+  Send,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -21,10 +23,20 @@ import { useEffect, useState } from "react";
 
 const merchantMenu = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "My Store", href: "/dashboard/store", icon: Store },
-  { name: "My Campaign", href: "/dashboard/campaign", icon: Package },
-  { name: "Voucher", href: "/dashboard/vouchers", icon: TicketPercent },
+  { name: "My Channel", href: "/dashboard/channels", icon: Store },
+  { name: "My inbox", href: "/dashboard/inbox", icon: Store },
+// 🔥 BROADCAST CORE
+  { name: "Contacts", href: "/dashboard/contacts", icon: FileText },
+  { name: "Templates", href: "/dashboard/templates", icon: FileText },
+  { name: "Broadcasts", href: "/dashboard/broadcasts", icon: Send },
+ // { name: "My Store", href: "/dashboard/store", icon: Store },
+ // { name: "My Campaign", href: "/dashboard/campaign", icon: Package },
+ // { name: "Voucher", href: "/dashboard/vouchers", icon: TicketPercent },
   { name: "My Chatbot", href: "/dashboard/chatbot", icon: Package },
+  { name: "Chat Widget", href: "/dashboard/chat-widget", icon: Package },
+  { name: "Chat Page", href: "/dashboard/chat-page", icon: Package },
+  { name: "API", href: "/dashboard/chat-page", icon: Package },
+  { name: "Leads", href: "/dashboard/leads", icon: Users },
   { name: "Customer Hub", href: "/dashboard/customers", icon: Users },
   { name: "Reports", href: "/dashboard/reports", icon: BarChart3 },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
@@ -36,7 +48,7 @@ const adminMenu = [
   { name: "Admin Logs", href: "/dashboard/admin/logs", icon: Users },
   { name: "Templates", href: "/dashboard/admin/templates", icon: Users },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
-  { name: "Profile", href: "/dashboard/profile", icon: Settings },
+  { name: "Profile", href: "/dashboard/profile", icon: Users },
 ];
 
 export default function Sidebar() {

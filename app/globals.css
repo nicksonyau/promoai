@@ -1,23 +1,50 @@
 @import "tailwindcss";
 
-/* === COLOR + FONT VARIABLES === */
+/* ========================================================= */
+/* COLOR + FONT VARIABLES (SINGLE SOURCE OF TRUTH)           */
+/* ========================================================= */
+
 :root {
+  /* Base surfaces */
   --background: #ffffff;
   --foreground: #171717;
-  --brand-purple: #7c3aed;
-  --brand-purple-light: #ede9fe;
-  --brand-gray: #f9fafb;
-  --brand-text: #374151;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  /* Brand (primary) */
+  --brand-primary: #7c3aed;          /* purple-600 */
+  --brand-primary-hover: #6d28d9;    /* purple-700 */
+  --brand-primary-light: #ede9fe;    /* purple-100 */
+
+  /* Text */
+  --text-muted: #6b7280;             /* gray-500 */
+  --text-default: #374151;           /* gray-700 */
+
+  /* States */
+  --danger: #dc2626;                 /* red-600 */
+
+  /* Radius */
+  --radius-card: 1rem;               /* rounded-2xl */
+  --radius-input: 0.75rem;           /* rounded-lg */
+
+  /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-/* === DARK MODE === */
+/* ========================================================= */
+/* THEME BINDING (TAILWIND v4 INLINE THEME)                  */
+/* ========================================================= */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+}
+
+/* ========================================================= */
+/* DARK MODE                                                 */
+/* ========================================================= */
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -25,7 +52,10 @@
   }
 }
 
-/* === BASE BODY === */
+/* ========================================================= */
+/* BASE BODY                                                 */
+/* ========================================================= */
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -33,28 +63,57 @@ body {
   @apply antialiased;
 }
 
-/* =============================== */
-/* PROMOHUBAI GLOBAL FORM STYLES  */
-/* =============================== */
+/* ========================================================= */
+/* GLOBAL SEMANTIC HELPERS                                   */
+/* ========================================================= */
+
+.text-muted {
+  color: var(--text-muted);
+}
+
+.text-primary {
+  color: var(--brand-primary);
+}
+
+.text-error {
+  color: var(--danger);
+}
+
+/* ========================================================= */
+/* PROMOHUBAI GLOBAL FORM SYSTEM                             */
+/* ========================================================= */
 
 .form-card {
-  @apply bg-white dark:bg-neutral-900 p-8 rounded-2xl shadow-md w-full max-w-lg;
+  @apply bg-white dark:bg-neutral-900 p-8 shadow-md w-full max-w-lg;
+  border-radius: var(--radius-card);
 }
 
 .form-title {
-  @apply text-3xl font-bold text-purple-600 mb-6 text-center;
+  @apply text-3xl font-bold mb-6 text-center;
+  color: var(--brand-primary);
 }
 
 .form-label {
-  @apply block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1;
+  @apply block text-sm font-medium mb-1;
+  color: var(--text-default);
 }
 
 .form-input,
 .form-textarea,
 .form-select {
-  @apply w-full border border-gray-300 dark:border-gray-700 rounded-lg px-4 py-2
-  focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-400
-  bg-white dark:bg-neutral-800 text-gray-900 dark:text-gray-100 transition;
+  @apply w-full px-4 py-2 transition bg-white dark:bg-neutral-800
+  border border-gray-300 dark:border-gray-700
+  text-gray-900 dark:text-gray-100
+  focus:outline-none focus:ring-2;
+
+  border-radius: var(--radius-input);
+  --tw-ring-color: rgb(124 58 237 / 0.35); /* purple focus */
+}
+
+.form-input:focus,
+.form-textarea:focus,
+.form-select:focus {
+  border-color: var(--brand-primary);
 }
 
 .form-input[disabled],
@@ -62,44 +121,72 @@ body {
   @apply bg-gray-100 dark:bg-neutral-700 cursor-not-allowed text-gray-500;
 }
 
+/* ========================================================= */
+/* BUTTONS                                                   */
+/* ========================================================= */
+
 .btn-primary {
-  @apply w-full bg-purple-600 text-white py-3 rounded-lg font-semibold
-  hover:bg-purple-700 hover:shadow-lg transition-all;
+  @apply w-full text-white py-3 font-semibold transition-all;
+  background-color: var(--brand-primary);
+  border-radius: var(--radius-input);
+}
+
+.btn-primary:hover {
+  background-color: var(--brand-primary-hover);
 }
 
 .btn-secondary {
-  @apply w-full bg-purple-100 text-purple-700 py-3 rounded-lg font-semibold
-  hover:bg-purple-200 border border-purple-200 transition-all
-  dark:bg-neutral-800 dark:text-purple-300 dark:hover:bg-neutral-700;
+  @apply w-full py-3 font-semibold transition-all border;
+  background-color: var(--brand-primary-light);
+  color: var(--brand-primary);
+  border-color: var(--brand-primary-light);
+  border-radius: var(--radius-input);
 }
 
-.text-muted {
-  @apply text-sm text-gray-500 dark:text-gray-400;
+.btn-secondary:hover {
+  background-color: #ddd6fe; /* purple-200 */
 }
 
-.text-error {
-  @apply text-red-600 text-sm;
+/* ========================================================= */
+/* CHECKBOX / RADIO                                          */
+/* ========================================================= */
+
+.checkbox {
+  accent-color: var(--brand-primary);
 }
+
+/* ========================================================= */
+/* FORM GRID HELPERS                                         */
+/* ========================================================= */
 
 .form-grid-2 {
-  @apply grid grid-cols-2 gap-3;
+  @apply grid grid-cols-1 md:grid-cols-2 gap-3;
 }
 
 .form-grid-3 {
-  @apply grid grid-cols-3 gap-3;
+  @apply grid grid-cols-1 md:grid-cols-3 gap-3;
 }
 
-/* =============================== */
-/* UNIVERSAL UTILITY LAYOUT       */
-/* =============================== */
+/* ========================================================= */
+/* UNIVERSAL PAGE LAYOUT                                     */
+/* ========================================================= */
 
 .page-container {
-  @apply flex justify-center items-start min-h-screen bg-gray-50 dark:bg-neutral-950 py-12 px-4;
+  @apply flex justify-center items-start min-h-screen py-12 px-4;
+  background-color: #f9fafb;
+}
+
+.dark .page-container {
+  background-color: #0b0b0b;
 }
 
 .shadow-soft {
   @apply shadow-md hover:shadow-lg transition-all;
 }
+
+/* ========================================================= */
+/* DASHBOARD LAYOUT                                          */
+/* ========================================================= */
 
 .dashboard-content {
   @apply flex flex-col flex-1 px-8 py-10 lg:px-12;
@@ -109,21 +196,27 @@ body {
   @apply flex justify-center;
 }
 
-/* Promo public pages */
+/* ========================================================= */
+/* PROMO / PUBLIC PAGES                                      */
+/* ========================================================= */
+
 .promo-container {
   @apply flex flex-col items-center min-h-screen bg-gray-50;
 }
 
 .promo-card {
-  @apply bg-white rounded-2xl shadow-lg p-6 max-w-2xl w-full mt-[-40px] relative z-10;
+  @apply bg-white p-6 max-w-2xl w-full relative z-10 shadow-lg;
+  border-radius: var(--radius-card);
+  margin-top: -40px;
 }
 
-/* =============================== */
-/* ADMIN DASHBOARD TABLE STANDARD */
-/* =============================== */
+/* ========================================================= */
+/* TABLES (ADMIN / DASHBOARD)                                */
+/* ========================================================= */
 
 .table-wrapper {
-  @apply overflow-hidden rounded-xl shadow border border-gray-200 bg-white;
+  @apply overflow-hidden shadow border border-gray-200 bg-white;
+  border-radius: var(--radius-card);
 }
 
 .custom-table {
@@ -131,18 +224,22 @@ body {
 }
 
 .custom-table thead th {
-  @apply bg-gray-50 px-4 py-3 text-left text-sm font-semibold text-gray-700 whitespace-nowrap;
+  @apply bg-gray-50 px-4 py-3 text-left text-sm font-semibold whitespace-nowrap;
+  color: var(--text-default);
 }
 
 .custom-table tbody td {
-  @apply px-4 py-2 text-sm text-gray-800 whitespace-nowrap;
+  @apply px-4 py-2 text-sm whitespace-nowrap;
+  color: var(--text-default);
 }
 
 .custom-table tbody tr:hover {
   @apply bg-gray-50;
 }
 
-/* BADGES */
+/* ========================================================= */
+/* BADGES                                                    */
+/* ========================================================= */
 
 .badge {
   @apply px-2 py-1 text-xs rounded font-medium;
@@ -164,25 +261,29 @@ body {
   @apply bg-gray-200 text-gray-800;
 }
 
-/* DELETE BUTTON */
+/* ========================================================= */
+/* DANGER ACTIONS                                            */
+/* ========================================================= */
 
 .btn-danger {
   @apply px-3 py-1 bg-red-500 text-white rounded-md hover:bg-red-600 transition;
 }
 
-/* ==== Debug Panel (Global Reusable Component Style) ==== */
+/* ========================================================= */
+/* DEBUG PANEL (REUSABLE)                                    */
+/* ========================================================= */
 
 .debug-panel {
-  background: #f5f5f5;         /* light gray */
-  color: #4b5563;              /* tailwind gray-600 */
-  font-size: 0.75rem;          /* text-xs */
-  padding: 0.75rem;            /* p-3 */
-  border-radius: 0.5rem;       /* rounded-lg */
-  border: 1px solid #e5e7eb;   /* border-gray-200 */
-  white-space: pre-wrap;       /* preserve formatting */
-  max-height: 12rem;           /* ~48 Tailwind */
-  overflow: auto;              /* scroll if too long */
-  text-align: left;            /* like logs */
-  margin-top: 0.75rem;         /* mt-3 */
+  background: #f5f5f5;
+  color: #4b5563;
+  font-size: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  white-space: pre-wrap;
+  max-height: 12rem;
+  overflow: auto;
+  text-align: left;
+  margin-top: 0.75rem;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }

@@ -22,15 +22,12 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Toast messages from redirects
+  // Handle toast messages from redirects
   useEffect(() => {
-    const verifySent = searchParams.get("verify");
-    const verified = searchParams.get("verified");
-
-    if (verifySent === "sent") {
+    if (searchParams.get("verify") === "sent") {
       toast.success(t("login.verify_sent"));
     }
-    if (verified === "1") {
+    if (searchParams.get("verified") === "1") {
       toast.success(t("login.verified"));
     }
   }, [searchParams, t]);
@@ -50,26 +47,14 @@ export default function LoginPage() {
 
       if (res.ok && data?.success) {
         if (data.user) {
-          // Save full user object (existing)
           localStorage.setItem("user", JSON.stringify(data.user));
-
-          const companyId = data.user.companyId;
-          if (companyId) {
-            localStorage.setItem("companyId", companyId);
-            console.log("[Login] companyId:", companyId);
-          } else {
-            console.warn("[Login] No companyId received in user object");
+          if (data.user.companyId) {
+            localStorage.setItem("companyId", data.user.companyId);
           }
         }
 
-        // ---------------------------------------------------
-        // 🔥 NEW: Save session token for Authorization header
-        // ---------------------------------------------------
         if (data.token) {
           localStorage.setItem("sessionToken", data.token);
-          console.warn("[Login] Session token:", data.token);
-        } else {
-          console.warn("[Login] No session token returned from server");
         }
 
         toast.success(t("login.success"));
@@ -78,7 +63,7 @@ export default function LoginPage() {
       }
 
       toast.error(data?.error || t("login.invalid"));
-    } catch (err) {
+    } catch {
       toast.error(t("errors.SERVER_ERROR"));
     } finally {
       setLoading(false);
@@ -86,52 +71,86 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="page-container">
-      <Card>
-        <h2 className="form-title">{t("login.title")}</h2>
-        <p className="text-muted text-center mb-6">
-          {t("login.subtitle")}{" "}
-          <span className="text-purple-600 font-semibold">PromoHubAI</span>
-        </p>
+    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+      {/* LEFT — PRODUCT STORY */}
+      <div
+        className="hidden lg:flex flex-col justify-center px-16 relative"
+        style={{
+          backgroundImage: "url(/images/auth-hero.png)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        <div className="relative z-10 max-w-md text-white">
+          <h1 className="text-4xl font-bold mb-4">
+            Your AI Agent That Builds, Promotes & Talks
+          </h1>
 
-        <form onSubmit={handleLogin} className="space-y-5">
-          {/* EMAIL */}
-          <div>
-            <label className="form-label">{t("login.email")}</label>
+          <p className="text-white/80 mb-6">
+            Everything you need to launch AI-powered promo microsites,
+            WhatsApp chatbots, QR campaigns, and lead capture — in minutes.
+          </p>
+
+          <ul className="space-y-2 text-white/90 text-sm">
+            <li>✅ 1-click AI promo microsites</li>
+            <li>✅ WhatsApp chatbot & lead capture</li>
+            <li>✅ QR campaigns & vouchers</li>
+            <li>✅ Auto-updating SEO content</li>
+            <li>✅ Built for F&B, retail & SMEs</li>
+          </ul>
+
+          <p className="mt-6 text-xs text-white/60">
+            Trusted by growing businesses across Asia.
+          </p>
+        </div>
+      </div>
+
+      {/* RIGHT — LOGIN (✅ CENTERED) */}
+      <div className="flex items-center justify-center min-h-screen px-4">
+        <Card className="form-card">
+          <h2 className="form-title">{t("login.title")}</h2>
+
+          <p className="text-muted text-center mb-6">
+            {t("login.subtitle")}{" "}
+            <span className="text-primary font-semibold">PromoHubAI</span>
+          </p>
+
+          <form onSubmit={handleLogin} className="space-y-5">
             <Input
               type="email"
+              label={t("login.email")}
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
-          </div>
 
-          {/* PASSWORD */}
-          <div>
-            <label className="form-label">{t("login.password")}</label>
             <Input
               type="password"
+              label={t("login.password")}
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="btn-primary"
+            >
+              {loading ? t("login.loading") : t("login.login_button")}
+            </Button>
+          </form>
+
+          <div className="mt-6 text-center text-muted">
+            {t("login.no_account")}{" "}
+            <a href={`/${lang}/register`} className="link-primary">
+              {t("login.register_here")}
+            </a>
           </div>
-
-          <Button type="submit" disabled={loading}>
-            {loading ? t("login.loading") : t("login.login_button")}
-          </Button>
-        </form>
-
-        {/* REGISTER LINK */}
-        <div className="mt-6 text-center text-muted">
-          {t("login.no_account")}{" "}
-          <a href={`/${lang}/register`} className="text-purple-600 hover:underline">
-            {t("login.register_here")}
-          </a>
-        </div>
-      </Card>
+        </Card>
+      </div>
     </div>
   );
 }

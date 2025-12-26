@@ -138,8 +138,13 @@ export default function ChatbotListPage() {
                 </td>
                 <td className="p-3">
                   <div className="flex gap-4">
-
                     {/* ADD SOURCE BUTTON */}
+                     <Link
+                      href={`/${lang}/dashboard/chatbot/${bot.id}/history`}
+                    className="text-gray-700 hover:underline"
+                   >
+                    History
+                    </Link>
                     <button
                       onClick={() => setSelectBot(bot.id)}
                       className="text-gray-800 hover:underline"
