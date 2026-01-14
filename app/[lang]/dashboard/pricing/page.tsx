@@ -7,32 +7,6 @@ import { apiFetch } from "@/lib/api"
 export default function PricingPage() {
   return (
     <main className="bg-gray-50 text-gray-900">
-
-      {/* ================= HEADER ================= */}
-      <header className="bg-white border-b">
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-          <Link href="/" className="text-xl font-bold">
-            VibeSuitAI
-          </Link>
-
-          <Link href="/dashboard">
-            <button className="bg-purple-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-purple-700">
-              Back to Dashboard
-            </button>
-          </Link>
-        </div>
-      </header>
-
-      {/* ================= HERO ================= */}
-      <section className="py-24 text-center px-6">
-        <h1 className="text-5xl font-bold mb-4">
-          Simple Pricing That Scales
-        </h1>
-        <p className="max-w-2xl mx-auto text-gray-600">
-          Start free. Upgrade when your WhatsApp engagement grows.
-        </p>
-      </section>
-
       {/* ================= PLANS ================= */}
       <section className="max-w-7xl mx-auto px-6 pb-24">
         <div className="grid md:grid-cols-4 gap-8">
@@ -124,7 +98,7 @@ export default function PricingPage() {
 
       {/* ================= FOOTER ================= */}
       <footer className="bg-white border-t py-8 text-center text-gray-500">
-        © 2025 PromoHubAI. All rights reserved.
+        © 2025 VibeSuitAI. All rights reserved.
       </footer>
     </main>
   )
@@ -157,23 +131,43 @@ function Plan({
   async function choosePlan() {
     try {
       setLoading(true)
-      console.log("[Pricing] activating plan:", name)
+      console.log("[Pricing] choose plan:", name)
 
-      const res = await apiFetch("/subscription/activate", {
-        method: "POST",
-        body: JSON.stringify({ plan: name }),
-      })
+      // ✅ FREE → manual activate (same as your current behavior)
+      if (name === "free") {
+        const res = await apiFetch("/subscription/activate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan: name }),
+        })
 
-      const data = await res.json()
-      if (!res.ok || !data.success) {
-        throw new Error(data?.error || "Activation failed")
+        const data = await res.json().catch(() => null)
+        if (!res.ok || !data?.success) {
+          throw new Error(data?.error || "Activation failed")
+        }
+
+        console.log("[Pricing] activated free, redirecting")
+        window.location.href = "/en/dashboard"
+        return
       }
 
-      console.log("[Pricing] activated, redirecting")
-      window.location.href = "/en/dashboard"
+      // ✅ PAID → Stripe Checkout redirect (RESTORE your previous flow)
+      const res = await apiFetch("/subscription/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: name, interval: "monthly" }),
+      })
+
+      const data = await res.json().catch(() => null)
+      if (!res.ok || !data?.success || !data?.url) {
+        throw new Error(data?.error || "Checkout failed")
+      }
+
+      console.log("[Pricing] redirecting to Stripe:", data.url)
+      window.location.href = data.url
     } catch (e: any) {
-      console.error("[Pricing] activation error", e)
-      alert(e.message || "Failed to activate plan")
+      console.error("[Pricing] choosePlan error", e)
+      alert(e?.message || "Failed to choose plan")
     } finally {
       setLoading(false)
     }
@@ -231,7 +225,7 @@ function Plan({
           ${loading ? "opacity-60 cursor-not-allowed" : ""}
         `}
       >
-        {loading ? "Activating..." : `Choose ${title}`}
+        {loading ? "Processing..." : `Choose ${title}`}
       </button>
     </div>
   )

@@ -12,13 +12,13 @@ export default function HomePage() {
           {/* Logo */}
           <div className="flex items-center gap-3">
             <Image
-              src="/images/pai-logo4.png"
+              src="/images/logo.png"
               alt="PAI Logo"
               width={60}
               height={60}
             />
             <span className="text-xl font-bold text-gray-900">
-              PromoHubAI
+              VibeSuitAI
             </span>
           </div>
 
@@ -29,7 +29,7 @@ export default function HomePage() {
             <a href="/blog" className="hover:text-purple-600">Resources</a>
           </nav>
 
-          <Link href="/register">
+          <Link href="/en/register">
             <button className="bg-purple-600 text-white px-5 py-2 rounded-lg font-semibold hover:bg-purple-700">
               Get Started
             </button>
@@ -52,14 +52,20 @@ export default function HomePage() {
         </p>
 
         <div className="mt-10 flex justify-center gap-4">
-          <Link href="/register">
+          <Link href="/en/register">
             <button className="bg-purple-600 text-white px-8 py-3 rounded-xl font-semibold">
               Start Free
             </button>
           </Link>
-          <button className="border px-8 py-3 rounded-xl font-semibold hover:bg-gray-100">
-            Book a Demo
-          </button>
+          <a
+  href="https://calendly.com/idthrivo/30min"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  <button className="border px-8 py-3 rounded-xl font-semibold hover:bg-gray-100">
+    Book a Demo
+  </button>
+</a>
         </div>
       </section>
 
@@ -162,7 +168,7 @@ function Price({
     <div className={`bg-white border rounded-2xl p-8 ${highlight ? "border-purple-600" : ""}`}>
       <h3 className="text-xl font-bold mb-2">{name}</h3>
       <p className="text-4xl font-bold mb-6">{price}/mo</p>
-      <Link href="/register">
+      <Link href="/en/register">
         <button className="bg-purple-600 text-white px-6 py-2 rounded-lg hover:bg-purple-700">
           Get Started
         </button>

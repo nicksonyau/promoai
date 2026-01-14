@@ -5,136 +5,237 @@ import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   Store,
-  Package,
   Users,
-  TicketPercent,
+  User,
   BarChart3,
   Settings,
-  LogOut,
-  ShieldCheck,
   FileText,
   Send,
+  Inbox,
+  Plug,
+  MessageSquare,
+  Code,
+  ChevronLeft,
+  ChevronRight,
+  Handshake,
 } from "lucide-react";
 import { useEffect, useState } from "react";
+
+/* ------------------------------------------
+   TYPES
+------------------------------------------*/
+
+type MenuItem = {
+  name: string;
+  href: string;
+  icon: any;
+  children?: MenuItem[];
+};
 
 /* ------------------------------------------
    MENU DEFINITIONS
 ------------------------------------------*/
 
-const merchantMenu = [
+const merchantMenu: MenuItem[] = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "My Channel", href: "/dashboard/channels", icon: Store },
-  { name: "My inbox", href: "/dashboard/inbox", icon: Store },
-// 🔥 BROADCAST CORE
-  { name: "Contacts", href: "/dashboard/contacts", icon: FileText },
-  { name: "Templates", href: "/dashboard/templates", icon: FileText },
-  { name: "Broadcasts", href: "/dashboard/broadcasts", icon: Send },
- // { name: "My Store", href: "/dashboard/store", icon: Store },
- // { name: "My Campaign", href: "/dashboard/campaign", icon: Package },
- // { name: "Voucher", href: "/dashboard/vouchers", icon: TicketPercent },
-  { name: "My Chatbot", href: "/dashboard/chatbot", icon: Package },
-  { name: "Chat Widget", href: "/dashboard/chat-widget", icon: Package },
-  { name: "Chat Page", href: "/dashboard/chat-page", icon: Package },
-  { name: "API", href: "/dashboard/chat-page", icon: Package },
-  { name: "Leads", href: "/dashboard/leads", icon: Users },
-  { name: "Customer Hub", href: "/dashboard/customers", icon: Users },
+  //{ name: "My Channel", href: "/dashboard/channels", icon: Store },
+  { name: "Inbox", href: "/dashboard/inbox", icon: Inbox },
+
+  { name: "Contacts", href: "/dashboard/contacts", icon: Users },
+ // { name: "Templates", href: "/dashboard/templates", icon: FileText },
+  //{ name: "Broadcasts", href: "/dashboard/broadcasts", icon: Send },
+
+  {
+    name: "My Chatbot",
+    href: "/dashboard/chatbot",
+    icon: MessageSquare,
+    children: [
+      { name: "Chat Widget", href: "/dashboard/chat-widget", icon: Plug },
+    ],
+  },
+
+    // { name: "Chat Page", href: "/dashboard/chat-page", icon: MessageSquare },
+  { name: "API", href: "/dashboard/api", icon: Code },
+  { name: "Leads", href: "/dashboard/leads", icon: Handshake },
+
   { name: "Reports", href: "/dashboard/reports", icon: BarChart3 },
+
+  // ✅ keep Settings and Billing separate
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
-  { name: "Profile", href: "/dashboard/profile", icon: Settings },
+  { name: "Billing", href: "/dashboard/settings/billing", icon: Settings },
+
+  { name: "Profile", href: "/dashboard/profile", icon: User },
 ];
 
-const adminMenu = [
+const adminMenu: MenuItem[] = [
   { name: "Admin Users", href: "/dashboard/admin/users", icon: Users },
-  { name: "Admin Logs", href: "/dashboard/admin/logs", icon: Users },
-  { name: "Templates", href: "/dashboard/admin/templates", icon: Users },
+  { name: "Admin Logs", href: "/dashboard/admin/logs", icon: FileText },
+  { name: "Templates", href: "/dashboard/admin/templates", icon: FileText },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
-  { name: "Profile", href: "/dashboard/profile", icon: Users },
+  { name: "Profile", href: "/dashboard/profile", icon: User },
 ];
+
+/* ------------------------------------------
+   HELPERS
+------------------------------------------*/
+
+function isRouteActive(pathname: string, fullPath: string) {
+  // active on exact or any sub-route
+  return pathname === fullPath || pathname.startsWith(`${fullPath}/`);
+}
+
+/* ------------------------------------------
+   COMPONENT
+------------------------------------------*/
 
 export default function Sidebar() {
   const pathname = usePathname();
-
-  // Extract locale (/en/dashboard → en)
   const locale = pathname.split("/")[1] || "en";
   const prefix = (path: string) => `/${locale}${path}`;
 
-  // DEFAULT = MERCHANT (correct)
   const [view, setView] = useState<"merchant" | "admin">("merchant");
   const [role, setRole] = useState<"merchant" | "admin">("merchant");
+  const [collapsed, setCollapsed] = useState(false);
 
-  /* LOAD ROLE + VIEW FROM LOCALSTORAGE */
   useEffect(() => {
-    const savedRole = (localStorage.getItem("role") as "merchant" | "admin") || "merchant";
-    const savedView = (localStorage.getItem("dashboardView") as "merchant" | "admin") || "merchant";
-
-    setRole(savedRole);
-    setView(savedView);
+    setRole(
+      (localStorage.getItem("role") as "merchant" | "admin") || "merchant"
+    );
+    setView(
+      (localStorage.getItem("dashboardView") as "merchant" | "admin") ||
+        "merchant"
+    );
+    setCollapsed(localStorage.getItem("sidebarCollapsed") === "true");
   }, []);
 
-  /* SWITCH VIEW BUTTON */
-  const switchView = () => {
-    const next = view === "merchant" ? "admin" : "merchant";
-    setView(next);
-    localStorage.setItem("dashboardView", next);
+  const toggleCollapse = () => {
+    const next = !collapsed;
+    setCollapsed(next);
+    localStorage.setItem("sidebarCollapsed", String(next));
   };
 
-  const menuToShow = view === "admin" ? adminMenu : merchantMenu;
+  // ✅ FIX: you were always returning merchantMenu
+  const menuToShow =
+    view === "admin" && role === "admin" ? adminMenu : merchantMenu;
+
+  const billingPath = prefix("/dashboard/settings/billing");
+  const settingsPath = prefix("/dashboard/settings");
 
   return (
-    <aside className="w-64 h-screen bg-white border-r border-gray-200 flex flex-col">
-      {/* Logo */}
-      <div className="h-16 flex items-center justify-center border-b border-gray-200">
-        <h1 className="text-xl font-bold text-purple-600">PromoHubAI</h1>
+    <aside
+      className={`h-screen bg-white border-r border-gray-200 flex flex-col transition-all duration-200 ${
+        collapsed ? "w-16" : "w-64"
+      }`}
+    >
+      {/* Header */}
+      <div className="h-16 flex items-center justify-between px-3 border-b border-gray-200">
+        {!collapsed && (
+          <h1 className="text-xl font-bold text-purple-600">PromoHubAI</h1>
+        )}
+        <button
+          onClick={toggleCollapse}
+          className="p-1 rounded hover:bg-gray-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-300"
+          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {collapsed ? (
+            <ChevronRight className="w-5 h-5" />
+          ) : (
+            <ChevronLeft className="w-5 h-5" />
+          )}
+        </button>
       </div>
 
       {/* Menu */}
-      <nav className="flex-1 px-4 py-6 space-y-1">
+      <nav className="flex-1 px-2 py-4 space-y-1">
         {menuToShow.map((item) => {
           const Icon = item.icon;
-
           const fullPath = prefix(item.href);
-          const isActive = pathname === fullPath;
+
+          // ✅ Special-case to prevent Settings + Billing both active
+          let isActive = false;
+
+          if (item.href === "/dashboard") {
+            // exact only
+            isActive = pathname === fullPath;
+          } else if (item.href === "/dashboard/settings") {
+            // active for settings pages, but NOT billing
+            isActive =
+              isRouteActive(pathname, settingsPath) &&
+              !isRouteActive(pathname, billingPath);
+          } else if (item.href === "/dashboard/settings/billing") {
+            // billing only
+            isActive = isRouteActive(pathname, billingPath);
+          } else {
+            isActive = isRouteActive(pathname, fullPath);
+          }
+
+          const isChildActive =
+            item.children?.some((c) => {
+              const childFull = prefix(c.href);
+              return isRouteActive(pathname, childFull);
+            }) ?? false;
+
+          const active = isActive || isChildActive;
+
+          const focusRing = !active
+            ? "focus-visible:ring-2 focus-visible:ring-purple-300"
+            : "";
 
           return (
-            <Link
-              key={item.name}
-              href={fullPath}
-              className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition ${
-                isActive
-                  ? "bg-purple-100 text-purple-600"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-purple-600"
-              }`}
-            >
-              <Icon className="w-5 h-5" />
-              {item.name}
-            </Link>
+            <div key={item.name}>
+              <Link
+                href={fullPath}
+                title={collapsed ? item.name : undefined}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition
+                  focus:outline-none ${focusRing}
+                  ${
+                    active
+                      ? "bg-purple-100 text-purple-600"
+                      : "text-gray-600 hover:bg-gray-50 hover:text-purple-600 focus-visible:bg-purple-100 focus-visible:text-purple-600"
+                  }
+                  ${collapsed ? "justify-center" : ""}
+                `}
+              >
+                <Icon className="w-5 h-5" />
+                {!collapsed && item.name}
+              </Link>
+
+              {!collapsed && item.children && (
+                <div className="ml-8 mt-1 space-y-1">
+                  {item.children.map((child) => {
+                    const ChildIcon = child.icon;
+                    const childPath = prefix(child.href);
+
+                    const childActive = isRouteActive(pathname, childPath);
+
+                    const childFocusRing = !childActive
+                      ? "focus-visible:ring-2 focus-visible:ring-purple-200"
+                      : "";
+
+                    return (
+                      <Link
+                        key={child.name}
+                        href={childPath}
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm transition
+                          focus:outline-none ${childFocusRing}
+                          ${
+                            childActive
+                              ? "bg-purple-50 text-purple-600"
+                              : "text-gray-500 hover:bg-gray-50 hover:text-purple-600 focus-visible:bg-purple-50 focus-visible:text-purple-600"
+                          }
+                        `}
+                      >
+                        <ChildIcon className="w-4 h-4" />
+                        {child.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           );
         })}
       </nav>
-
-      {/* Footer buttons */}
-      <div className="p-4 border-t border-gray-200 flex flex-col gap-2">
-
-        <button
-          onClick={switchView}
-          className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-purple-600 bg-purple-50 hover:bg-purple-100 transition"
-        >
-          <ShieldCheck className="w-5 h-5" />
-          {view === "admin" ? "Switch to Merchant View" : "Switch to Admin View"}
-        </button>
-
-        <button
-          onClick={() => {
-            localStorage.clear();
-            document.cookie = "role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-            window.location.href = `/${locale}/login`;
-          }}
-          className="flex items-center gap-3 w-full px-3 py-2 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-purple-600"
-        >
-          <LogOut className="w-5 h-5" />
-          Logout
-        </button>
-      </div>
     </aside>
   );
 }

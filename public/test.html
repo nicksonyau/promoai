@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PromoHubAI Chatbox Test</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+    }
+
+    .info {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .box {
+      padding: 20px;
+      background: #f6f6f9;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>✅ PromoHubAI — AI Engagement Engine Chatbox Test</h2>
+  <div class="box">
+    <p class="info">If your Worker is running on <b>wrangler dev</b>, the chatbox should appear at the bottom-right corner of this page.</p>
+    <p>If you don’t see the chatbox:</p>
+    <ul>
+      <li>Make sure <code>wrangler dev</code> is running</li>
+      <li>Check the port number (default is <code>localhost:8788</code>, but yours may be different)</li>
+      <li>Open Browser DevTools → Console to check error messages</li>
+    </ul>
+  </div>
+
+  <script
+    src="http://localhost:3000/embed.js?v=2.1"
+    data-api-base="http://localhost:8787"
+    data-chatbot-id="42188f5f-0ce8-461f-bb1b-1b679569b924"
+    data-widget-id="8221e097-ed7f-46b1-842e-328585e7f044"
+    data-company-id="80e19a17-49ea-4ba3-973f-f987cf2921f6"
+  ></script>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PromoHubAI Embed Preview</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 28px;
+      }
+      .box {
+        padding: 16px;
+        background: #f6f6f9;
+        border-radius: 10px;
+        border: 1px solid #ddd;
+        max-width: 820px;
+      }
+      code {
+        background: #fff;
+        padding: 2px 6px;
+        border-radius: 6px;
+        border: 1px solid #eee;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>✅ PromoHubAI — Embed Preview</h2>
+
+    <div class="box">
+      <p>
+        If <code>embed.js</code> loads correctly, the chat bubble should appear at the
+        bottom-right.
+      </p>
+      <ul>
+        <li>Check DevTools Console if nothing shows.</li>
+        <li>
+          This page injects <code>/embed.js</code> using query params:
+          <code>chatbotId</code>, <code>widgetId</code>, <code>companyId</code>, <code>apiBase</code>
+        </li>
+      </ul>
+    </div>
+
+    <script>
+      (function () {
+        try {
+          const u = new URL(window.location.href);
+
+          const chatbotId = (u.searchParams.get("chatbotId") || "").trim();
+          const widgetId = (u.searchParams.get("widgetId") || "").trim();
+          const companyId = (u.searchParams.get("companyId") || "").trim();
+          const apiBase = (u.searchParams.get("apiBase") || "").trim();
+          const debug = (u.searchParams.get("debug") || "").trim();
+
+          if (!chatbotId || !widgetId) {
+            console.error("[embed-preview] Missing chatbotId/widgetId", {
+              chatbotId,
+              widgetId,
+            });
+            return;
+          }
+
+          // Remove any old host if you refresh quickly
+          const hid = "ph-embed-host-" + widgetId.slice(0, 8);
+          const old = document.getElementById(hid);
+          if (old && old.parentNode) old.parentNode.removeChild(old);
+
+          // Clear version guard so embed.js can re-inject
+          window.__PH_EMBED__ = undefined;
+
+          const s = document.createElement("script");
+          s.async = true;
+
+          // cache bust to avoid stale embed.js in dev
+          s.src = "/embed.js?_pv=" + Date.now();
+
+          if (apiBase) s.setAttribute("data-api-base", apiBase);
+          s.setAttribute("data-chatbot-id", chatbotId);
+          s.setAttribute("data-widget-id", widgetId);
+          if (companyId) s.setAttribute("data-company-id", companyId);
+          if (debug === "1") s.setAttribute("data-debug", "1");
+
+          document.body.appendChild(s);
+        } catch (e) {
+          console.error("[embed-preview] Failed", e);
+        }
+      })();
+    </script>
+  </body>
+</html>
